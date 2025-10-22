@@ -15,9 +15,22 @@ export default defineConfig({
     include: ['dayjs']
   },
   build: {
+    outDir: 'dist',
+    sourcemap: false,
+    minify: 'esbuild',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui': ['antd', '@ant-design/icons'],
+          'web3': ['ethers', 'viem', 'wagmi']
+        }
+      }
+    },
     commonjsOptions: {
       transformMixedEsModules: true
-    }
+    },
+    chunkSizeWarningLimit: 1000
   },
   server: {
     port: 5173,
