@@ -1,0 +1,21 @@
+{
+  "version": "v2.0",
+  "network": "bscTestnet",
+  "contractAddress": "0xEdA477776C59f0F78A2874945d659aDF27E46EA7",
+  "deployer": "0x90465a524Fd4c54470f77a11DeDF7503c951E62F",
+  "timestamp": "2025-10-22T00:40:37.679Z",
+  "blockNumber": 69663796,
+  "config": {
+    "decimals": "10000",
+    "referralBonus": "2000",
+    "secondsUntilInactive": "2592000",
+    "level1Rate": "7500",
+    "level2Rate": "2500",
+    "pointsPerBNB": "1000"
+  },
+  "features": {
+    "eventDriven": true,
+    "pointsSystem": true,
+    "description": "v2.0: 事件驱动积分发放系统"
+  }
+}

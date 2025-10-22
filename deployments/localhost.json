@@ -1,0 +1,21 @@
+{
+  "version": "v2.0",
+  "network": "localhost",
+  "contractAddress": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+  "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "timestamp": "2025-10-21T04:25:34.604Z",
+  "blockNumber": 3,
+  "config": {
+    "decimals": "10000",
+    "referralBonus": "2000",
+    "secondsUntilInactive": "2592000",
+    "level1Rate": "7500",
+    "level2Rate": "2500",
+    "pointsPerBNB": "1000"
+  },
+  "features": {
+    "eventDriven": true,
+    "pointsSystem": true,
+    "description": "v2.0: 事件驱动积分发放系统"
+  }
+}
