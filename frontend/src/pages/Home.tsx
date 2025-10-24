@@ -1,26 +1,47 @@
-import { useState } from 'react'
-import { Row, Col, Typography, Button, Space, Statistic, Card } from 'antd'
-import { TeamOutlined, TrophyOutlined, GiftOutlined, RocketOutlined } from '@ant-design/icons'
+import { useState, useEffect } from 'react'
+import { Row, Col, Typography, Button, Space, Statistic, Card, Spin } from 'antd'
+import { TeamOutlined, TrophyOutlined, GiftOutlined, RocketOutlined, ClockCircleOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useWeb3 } from '@/contexts/Web3Context'
 import { useReferral } from '@/hooks/useReferral'
+import { dashboardApi, type DashboardResponse } from '@/services/api'
 import ReferralInput from '@/components/referral/ReferralInput'
 import ReferralLinkGenerator from '@/components/referral/ReferralLinkGenerator'
 
-const { Title, Paragraph } = Typography
+const { Title, Paragraph, Text } = Typography
 
 /**
  * 首页组件
  */
 function Home() {
   const navigate = useNavigate()
-  const { isConnected, connectWallet, isConnecting } = useWeb3()
+  const { account, isConnected, connectWallet, isConnecting } = useWeb3()
   const { config, userInfo } = useReferral()
-  const [stats] = useState({
-    totalUsers: 12580,
-    totalRewards: '3,245.67',
-    activeReferrers: 8760
-  })
+  const [dashboardData, setDashboardData] = useState<DashboardResponse | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  // 获取仪表板数据
+  useEffect(() => {
+    if (account) {
+      fetchDashboardData()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account])
+
+  // 从后端API获取真实数据
+  const fetchDashboardData = async () => {
+    if (!account) return
+
+    setLoading(true)
+    try {
+      const data = await dashboardApi.getData(account)
+      setDashboardData(data)
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // 计算推荐奖励比例
   const level1Percentage = config ? (config.level1Rate / config.decimals) * 100 : 15
@@ -104,81 +125,108 @@ function Home() {
               {isConnecting ? '连接中...' : '开始使用'}
             </Button>
           ) : (
-            <Space size={16}>
-              <Button
-                type="primary"
-                size="large"
-                onClick={() => navigate('/dashboard')}
-                style={{
-                  height: 56,
-                  padding: '0 48px',
-                  fontSize: 18,
-                  fontWeight: 600
-                }}
-              >
-                进入仪表板
-              </Button>
-              <Button
-                size="large"
-                onClick={() => navigate('/leaderboard')}
-                style={{
-                  height: 56,
-                  padding: '0 48px',
-                  fontSize: 18,
-                  fontWeight: 600
-                }}
-              >
-                查看排行榜
-              </Button>
-            </Space>
+            <Button
+              size="large"
+              onClick={() => navigate('/leaderboard')}
+              style={{
+                height: 56,
+                padding: '0 48px',
+                fontSize: 18,
+                fontWeight: 600
+              }}
+            >
+              查看排行榜
+            </Button>
           )}
         </div>
 
-        {/* 统计数据 */}
-        <Row gutter={[24, 24]} style={{ marginTop: 60 }}>
-          <Col xs={24} sm={8}>
-            <Card
-              style={{
-                background: 'rgba(255, 107, 53, 0.1)',
-                border: '1px solid rgba(255, 107, 53, 0.3)'
-              }}
-            >
-              <Statistic
-                title="总用户数"
-                value={stats.totalUsers}
-                valueStyle={{ color: '#ff6b35', fontSize: 32, fontWeight: 700 }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card
-              style={{
-                background: 'rgba(78, 205, 196, 0.1)',
-                border: '1px solid rgba(78, 205, 196, 0.3)'
-              }}
-            >
-              <Statistic
-                title="总奖励 (BNB)"
-                value={stats.totalRewards}
-                valueStyle={{ color: '#4ecdc4', fontSize: 32, fontWeight: 700 }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card
-              style={{
-                background: 'rgba(255, 230, 109, 0.1)',
-                border: '1px solid rgba(255, 230, 109, 0.3)'
-              }}
-            >
-              <Statistic
-                title="活跃推荐者"
-                value={stats.activeReferrers}
-                valueStyle={{ color: '#ffe66d', fontSize: 32, fontWeight: 700 }}
-              />
-            </Card>
-          </Col>
-        </Row>
+        {/* 个人数据统计 - 仅连接钱包后显示 */}
+        {isConnected && dashboardData && (
+          <Row gutter={[24, 24]} style={{ marginTop: 60 }}>
+            {loading ? (
+              <Col span={24} style={{ textAlign: 'center', padding: 60 }}>
+                <Spin size="large" />
+              </Col>
+            ) : (
+              <>
+                <Col xs={24} sm={12} lg={6}>
+                  <Card
+                    style={{
+                      background: 'rgba(255, 107, 53, 0.1)',
+                      border: '1px solid rgba(255, 107, 53, 0.3)'
+                    }}
+                  >
+                    <Statistic
+                      title="总积分"
+                      value={dashboardData.total_rewards}
+                      valueStyle={{ color: '#ff6b35', fontSize: 32, fontWeight: 700 }}
+                      prefix={<GiftOutlined />}
+                    />
+                  </Card>
+                </Col>
+                <Col xs={24} sm={12} lg={6}>
+                  <Card
+                    style={{
+                      background: 'rgba(78, 205, 196, 0.1)',
+                      border: '1px solid rgba(78, 205, 196, 0.3)'
+                    }}
+                  >
+                    <Statistic
+                      title="推荐人数"
+                      value={dashboardData.referred_count}
+                      valueStyle={{ color: '#4ecdc4', fontSize: 32, fontWeight: 700 }}
+                      prefix={<TeamOutlined />}
+                    />
+                  </Card>
+                </Col>
+                <Col xs={24} sm={12} lg={6}>
+                  <Card
+                    style={{
+                      background: 'rgba(255, 230, 109, 0.1)',
+                      border: '1px solid rgba(255, 230, 109, 0.3)'
+                    }}
+                  >
+                    <Statistic
+                      title="最后活跃"
+                      value={dashboardData.days_since_active >= 0 ? dashboardData.days_since_active : '从未'}
+                      suffix={dashboardData.days_since_active >= 0 ? "天前" : ""}
+                      valueStyle={{ color: '#ffe66d', fontSize: 32, fontWeight: 700 }}
+                      prefix={<ClockCircleOutlined />}
+                    />
+                  </Card>
+                </Col>
+                <Col xs={24} sm={12} lg={6}>
+                  <Card
+                    style={{
+                      background: 'rgba(0, 217, 255, 0.1)',
+                      border: '1px solid rgba(0, 217, 255, 0.3)'
+                    }}
+                  >
+                    <div>
+                      <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 14 }}>我的推荐人</Text>
+                      <div style={{ marginTop: 8 }}>
+                        {dashboardData.referrer === '0x0000000000000000000000000000000000000000' ? (
+                          <Text style={{ fontSize: 16, color: 'rgba(255, 255, 255, 0.4)' }}>未绑定</Text>
+                        ) : (
+                          <Text
+                            copyable
+                            style={{
+                              fontSize: 14,
+                              fontFamily: 'monospace',
+                              color: '#00d9ff'
+                            }}
+                          >
+                            {`${dashboardData.referrer.slice(0, 6)}...${dashboardData.referrer.slice(-4)}`}
+                          </Text>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                </Col>
+              </>
+            )}
+          </Row>
+        )}
       </div>
 
       {/* 推荐功能区 */}

@@ -3,7 +3,6 @@ import { Layout } from 'antd'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import Home from '@/pages/Home'
-import Dashboard from '@/pages/Dashboard'
 import Leaderboard from '@/pages/Leaderboard'
 import Points from '@/pages/Points'
 import Teams from '@/pages/Teams'
@@ -25,9 +24,6 @@ function App() {
         <Routes>
           {/* 首页 */}
           <Route path="/" element={<Home />} />
-
-          {/* 仪表板 */}
-          <Route path="/dashboard" element={<Dashboard />} />
 
           {/* 排行榜 */}
           <Route path="/leaderboard" element={<Leaderboard />} />

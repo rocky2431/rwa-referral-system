@@ -1,6 +1,6 @@
 import { Layout, Menu, Button, Space, Dropdown, Typography } from 'antd'
 import { Link, useLocation } from 'react-router-dom'
-import { WalletOutlined, DashboardOutlined, TrophyOutlined, UserOutlined, LogoutOutlined, GiftOutlined, TeamOutlined, CheckCircleOutlined, QuestionCircleOutlined, AppstoreAddOutlined } from '@ant-design/icons'
+import { WalletOutlined, TrophyOutlined, UserOutlined, LogoutOutlined, GiftOutlined, TeamOutlined, CheckCircleOutlined, QuestionCircleOutlined, AppstoreAddOutlined } from '@ant-design/icons'
 import { useWeb3 } from '@/contexts/Web3Context'
 import type { MenuProps } from 'antd'
 
@@ -20,11 +20,6 @@ function Header() {
       key: '/',
       icon: <WalletOutlined />,
       label: <Link to="/">首页</Link>
-    },
-    {
-      key: '/dashboard',
-      icon: <DashboardOutlined />,
-      label: <Link to="/dashboard">仪表板</Link>
     },
     {
       key: '/points',

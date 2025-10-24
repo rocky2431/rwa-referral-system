@@ -92,3 +92,4 @@ desktop.ini
 
 # Alembic
 alembic/versions/*.pyc
+.vercel
